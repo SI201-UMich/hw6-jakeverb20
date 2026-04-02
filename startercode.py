@@ -61,24 +61,38 @@ def create_cache(dictionary, filename):
 
     
     
-
-
 def search_breed(breed_id):
 
-    """
-    Sends a GET request to the Dog API v2 for a single breed:
-        https://dogapi.dog/api/v2/breeds/{breed_id}
-    Breed ids are UUID strings in the live API.
+   """
+   Sends a GET request to the Dog API v2 for a single breed:
+       https://dogapi.dog/api/v2/breeds/{breed_id}
+   Breed ids are UUID strings in the live API.
 
-    ARGUMENTS:
-        breed_id: the breed id to request (string UUID from the API or your id list file)
 
-    RETURNS:
-        A tuple (parsed_json_dict, response_url) where the first element is the full
-        JSON body as a dict (with a top-level 'data' key on success), OR None if the
-        request failed or the response does not represent a successful breed lookup.
-    """
-    
+   ARGUMENTS:
+       breed_id: the breed id to request (string UUID from the API or your id list file)
+
+
+   RETURNS:
+       A tuple (parsed_json_dict, response_url) where the first element is the full
+       JSON body as a dict (with a top-level 'data' key on success), OR None if the
+       request failed or the response does not represent a successful breed lookup.
+   """
+   response_url = f"https://dogapi.dog/api/v2/breeds/{breed_id}"
+   try:
+       response = requests.get(response_url)
+      
+       if response.status_code == 200:
+           parsed_json_dict = response.json()
+          
+           if parsed_json_dict.get("data") is not None:
+               return (parsed_json_dict, response_url)        
+  
+   except Exception:
+       pass
+      
+   return None
+
 
 
 def update_cache(breed_ids, cache_file):
