@@ -181,24 +181,48 @@ def get_longest_lifespan_breed(cache_file):
    return "No breeds found"
     
     
-
 def get_groups_above_cutoff(cutoff, cache_file):
-    """
-    Counts how many cached breeds belong to each Dog API group, then keeps only
-    groups whose count is greater than or equal to cutoff.
+   """
+   Counts how many cached breeds belong to each Dog API group, then keeps only
+   groups whose count is greater than or equal to cutoff.
 
-    In Dog API v2, a breed's group is not a string in attributes; it is linked via:
-        data.relationships.group.data.id   (a group UUID string)
-    Skip any cache entry that has no group relationship or no id there.
 
-    ARGUMENTS:
-        cutoff: minimum number of breeds a group must have to appear in the result
-        cache_file: path to the JSON cache file
+   In Dog API v2, a breed's group is not a string in attributes; it is linked via:
+       data.relationships.group.data.id   (a group UUID string)
+   Skip any cache entry that has no group relationship or no id there.
 
-    RETURNS:
-        A dictionary {group_uuid: count} for groups with count >= cutoff only.
-    """
-    
+
+   ARGUMENTS:
+       cutoff: minimum number of breeds a group must have to appear in the result
+       cache_file: path to the JSON cache file
+
+
+   RETURNS:
+       A dictionary {group_uuid: count} for groups with count >= cutoff only.
+   """
+   dog_library = load_json(cache_file)
+   group_tally = {}
+
+
+   for api_url in dog_library:
+       try:
+           uuid = dog_library[api_url]['data']['relationships']['group']['data']['id']
+          
+           if uuid:
+               group_tally[uuid] = group_tally.get(uuid, 0) + 1
+              
+       except (KeyError, TypeError):
+           continue
+          
+   qualified_groups = {}
+  
+   for group_id, count in group_tally.items():
+  
+       if count >= cutoff:
+           qualified_groups[group_id] = count
+          
+   return qualified_groups
+
     
 
 
