@@ -137,22 +137,50 @@ def update_cache(breed_ids, cache_file):
     return f"Cached data for {percentage}% of breeds"
     
 
-
 def get_longest_lifespan_breed(cache_file):
-    """
-    For the breeds currently stored in the cache, this function finds the breed with the highest maximum lifespan.
-    If there is a tie, it returns the breed that comes first in alphabetical order.
+   """
+   For the breeds currently stored in the cache, this function finds the breed with the highest maximum lifespan.
+   If there is a tie, it returns the breed that comes first in alphabetical order.
 
-    ARGUMENTS:
-        cache_file: path to the JSON cache file
 
-    RETURNS:
-        A tuple (breed_name, max_lifespan_integer) for the winning breed, OR the
-        string "No breeds found" if no breed in the cache has a life.max value.
-    """
+   ARGUMENTS:
+       cache_file: path to the JSON cache file
+
+
+   RETURNS:
+       A tuple (breed_name, max_lifespan_integer) for the winning breed, OR the
+       string "No breeds found" if no breed in the cache has a life.max value.
+   """
+   cache = load_json(cache_file)
+   breed_name = None
+   max_lifespan_integer = -1
+  
+   for url in cache:
+       try:
+          
+           breed_data = cache[url]['data']
+           name = breed_data['attributes']['name']
+           lifespan = int(breed_data['attributes']['life']['max'])
+          
+           if lifespan > max_lifespan_integer:
+               max_lifespan_integer = lifespan
+               breed_name = name
+              
+           elif lifespan == max_lifespan_integer:
+               if breed_name is None or name < breed_name:
+                   breed_name = name
+                  
+       except (KeyError, TypeError, ValueError):
+          
+           continue
+          
+   if breed_name:
+     
+       return (breed_name, max_lifespan_integer)
+  
+   return "No breeds found"
     
     
-
 
 def get_groups_above_cutoff(cutoff, cache_file):
     """
