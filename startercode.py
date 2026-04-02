@@ -1,14 +1,14 @@
 # SI 201 HW6 (APIs, JSON, and Caching)
-# Your name:
-# Your student id:
-# Your email:
-# Who or what you worked with on this homework (including generative AI like ChatGPT):
+# Your name: Jake Verbick
+# Your student id: 05350662
+# Your email: jakeverb@umich.edu
+# Who or what you worked with on this homework (including generative AI like ChatGPT): Solo
 # If you worked with generative AI also add a statement for how you used it.
 # e.g.:
-# Asked ChatGPT for help debugging and understanding the JSON structure
-#
+# I prompted Gemini to breakdown the logic of nested JSON navigation before starting the code
+# I asked to explain the concept of determinism, which was useful in get_longest_lifespan_breed for the alphabetical order exception
 # Did your use of GenAI on this assignment align with your goals and guidelines in your Gen AI contract? If not, why?
-#
+# Yes. I used GenAI as a learning resource to help me understand the concepts in the assignment, and I purposefully prompted Gemini to explain, as opposed to revealing the answer
 # --- ARGUMENTS & EXPECTED RETURN VALUES PROVIDED --- #
 # --- SEE INSTRUCTIONS FOR FULL DETAILS ON METHOD IMPLEMENTATION --- #
 
@@ -36,7 +36,12 @@ def load_json(filename):
         A dictionary with the JSON data, OR an empty dictionary {} if the file
         cannot be opened or is not valid JSON.
     """
-    pass
+    try:
+        with open(filename, 'r', encoding='utf-8') as f:
+            return json.load(f)
+            
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
 
 
 def create_cache(dictionary, filename):
@@ -51,10 +56,12 @@ def create_cache(dictionary, filename):
     RETURNS:
         None
     """
-    pass
+    
+    
 
 
 def search_breed(breed_id):
+
     """
     Sends a GET request to the Dog API v2 for a single breed:
         https://dogapi.dog/api/v2/breeds/{breed_id}
@@ -68,10 +75,11 @@ def search_breed(breed_id):
         JSON body as a dict (with a top-level 'data' key on success), OR None if the
         request failed or the response does not represent a successful breed lookup.
     """
-    pass
+    
 
 
 def update_cache(breed_ids, cache_file):
+
     """
     For each breed_id, fetch data from the API and add it to the cache if not already present.
     Skip requests for breeds whose URL is already in the cache. Only count newly added,
@@ -85,7 +93,7 @@ def update_cache(breed_ids, cache_file):
         A string: "Cached data for {percentage}% of breeds",
         where percentage = (successful_new_adds / len(breed_ids)) * 100.
     """
-    pass
+    
 
 
 def get_longest_lifespan_breed(cache_file):
@@ -100,7 +108,8 @@ def get_longest_lifespan_breed(cache_file):
         A tuple (breed_name, max_lifespan_integer) for the winning breed, OR the
         string "No breeds found" if no breed in the cache has a life.max value.
     """
-    pass
+    
+    
 
 
 def get_groups_above_cutoff(cutoff, cache_file):
@@ -119,7 +128,8 @@ def get_groups_above_cutoff(cutoff, cache_file):
     RETURNS:
         A dictionary {group_uuid: count} for groups with count >= cutoff only.
     """
-    pass
+    
+    
 
 
 # Extra Credit
@@ -143,6 +153,9 @@ def recommend_breeds_in_same_group(breed_name, cache_file):
             "No group information available for '{breed_name}'."  (no group id)
             "No recommendations found based on '{breed_name}'."  (no other breeds in that group)
     """
+    
+
+
 
 
 class TestHomeworkDogAPI(unittest.TestCase):
@@ -367,7 +380,7 @@ class TestHomeworkDogAPI(unittest.TestCase):
     # -------------------------
     # extra credit - uncomment tests below to evaluate extra credit function
     # -------------------------
-    """
+    
     def test_recommend_breeds_in_same_group_empty_cache(self):
         create_cache({}, self.test_cache_file)
         self.assertEqual(
@@ -472,7 +485,7 @@ class TestHomeworkDogAPI(unittest.TestCase):
             recommend_breeds_in_same_group("breed a", self.test_cache_file),
             ["Breed B", "Breed Z"],
         )
-    """
+    
 
 
 if __name__ == "__main__":
