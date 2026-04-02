@@ -228,26 +228,75 @@ def get_groups_above_cutoff(cutoff, cache_file):
 
 # Extra Credit
 def recommend_breeds_in_same_group(breed_name, cache_file):
-    """
-    Recommends other breeds in the cache that share the same Dog API group id as
-    the given breed. Match the target breed by data["attributes"]["name"] (case-insensitive).
-    Compare groups using data["relationships"]["group"]["data"]["id"] (UUID).
-    Exclude the target breed in the result list.
-    Return breed names sorted alphabetically.
+   """
+   Recommends other breeds in the cache that share the same Dog API group id as
+   the given breed. Match the target breed by data["attributes"]["name"] (case-insensitive).
+   Compare groups using data["relationships"]["group"]["data"]["id"] (UUID).
+   Exclude the target breed in the result list.
+   Return breed names sorted alphabetically.
 
-    ARGUMENTS:
-        breed_name: the breed name to look up in the cache
-        cache_file: path to the JSON cache file
 
-    RETURNS:
-        EITHER a sorted list of other breed names in the same group
-        OR one of these strings:
-            "No breed data found in cache."  (empty cache)
-            "'{breed_name}' is not in the cache."  (name not found)
-            "No group information available for '{breed_name}'."  (no group id)
-            "No recommendations found based on '{breed_name}'."  (no other breeds in that group)
-    """
-    
+   ARGUMENTS:
+       breed_name: the breed name to look up in the cache
+       cache_file: path to the JSON cache file
+
+
+   RETURNS:
+       EITHER a sorted list of other breed names in the same group
+       OR one of these strings:
+           "No breed data found in cache."  (empty cache)
+           "'{breed_name}' is not in the cache."  (name not found)
+           "No group information available for '{breed_name}'."  (no group id)
+           "No recommendations found based on '{breed_name}'."  (no other breeds in that group)
+   """
+   cache = load_json(cache_file)
+  
+   if not cache:
+       return "No breed data found in cache."
+      
+   target_group_id = None
+   original_found_name = None
+  
+   for url in cache:
+       try:
+           name_in_cache = cache[url]['data']['attributes']['name']
+          
+           if name_in_cache.lower() == breed_name.lower():
+               original_found_name = name_in_cache
+          
+               target_group_id = cache[url]['data']['relationships']['group']['data']['id']
+               break
+
+
+       except (KeyError, TypeError):
+           continue
+          
+   if not original_found_name:
+       return f"'{breed_name}' is not in the cache."
+      
+   if not target_group_id:
+       return f"No group information available for '{original_found_name}'."
+      
+   recommendations = []
+  
+   for url in cache:
+       try:
+           name_in_cache = cache[url]['data']['attributes']['name']
+           group_id_in_cache = cache[url]['data']['relationships']['group']['data']['id']
+          
+           if group_id_in_cache == target_group_id and name_in_cache != original_found_name:
+               recommendations.append(name_in_cache)
+
+
+       except (KeyError, TypeError):
+           continue
+          
+   if not recommendations:
+       return f"No recommendations found based on '{original_found_name}'."
+      
+   return sorted(recommendations)
+
+
 
 
 
